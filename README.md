@@ -1,6 +1,6 @@
 # AlphaSeeker - 智能股票查询与分析
 
-[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
+[![License: Apache-2.0](https://img.shields.io/badge/License-Apache--2.0-blue.svg)](LICENSE)
 [![Python 3.9+](https://img.shields.io/badge/python-3.9+-blue.svg)](https://www.python.org/downloads/)
 [![qwen-agent](https://img.shields.io/badge/qwen_agent-0.0.5+-green.svg)](https://github.com/QwenLM/qwen-agent)
 
