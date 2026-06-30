@@ -1,5 +1,9 @@
 # AlphaSeeker - 智能股票查询与分析
 
+[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
+[![Python 3.9+](https://img.shields.io/badge/python-3.9+-blue.svg)](https://www.python.org/downloads/)
+[![qwen-agent](https://img.shields.io/badge/qwen_agent-0.0.5+-green.svg)](https://github.com/QwenLM/qwen-agent)
+
 基于 [qwen-agent](https://github.com/QwenLM/qwen-agent) 框架的智能股票查询与分析系统，支持自然语言对话、SQL 查询、ARIMA 价格预测、布林带检测和 Prophet 周期性分析。
 
 ## 功能特性
@@ -162,7 +166,11 @@ python stock_query_full.py    # 完整版 - 所有功能
 
 ## 贡献指南
 
-欢迎提交 Issue 和 Pull Request 来改进项目。
+欢迎提交 Issue 和 Pull Request 来改进项目。在贡献前，请：
+
+1. 从 `dev` 分支创建你的功能分支
+2. 确保代码可正常运行
+3. 在 PR 中说明变更内容和原因
 
 ## 注意事项
 
