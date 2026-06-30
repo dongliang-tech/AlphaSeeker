@@ -180,4 +180,4 @@ python stock_query_full.py    # 完整版 - 所有功能
 
 ## License
 
-[MIT License](LICENSE)
+[Apache License 2.0](LICENSE)
