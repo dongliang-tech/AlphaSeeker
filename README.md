@@ -125,7 +125,7 @@ python stock_query_full.py    # 完整版 - 所有功能
 ├── faq.txt                 # 常见问题知识库
 ├── requirements.txt        # Python 依赖
 ├── .env.example            # 环境变量模板
-└── LICENSE                 # MIT License
+└── LICENSE                 # Apache License 2.0
 ```
 
 ## 各版本功能对比
