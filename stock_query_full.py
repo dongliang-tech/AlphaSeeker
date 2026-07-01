@@ -304,6 +304,124 @@ class BollDetectionTool(BaseTool):
         img_md = f'![布林带检测]({img_path})'
         return f"{result_md}\n\n{img_md}"
 
+# macd_detection工具
+@register_tool('macd_detection')
+class MacdDetectionTool(BaseTool):
+    description = '对指定股票(ts_code)的收盘价进行MACD指标计算和金叉死叉检测，默认检测过去1年，也可自定义时间范围，返回金叉死叉日期及MACD图。'
+    parameters = [
+        {
+            'name': 'ts_code',
+            'type': 'string',
+            'description': '股票代码，必填',
+            'required': True
+        },
+        {
+            'name': 'start_date',
+            'type': 'string',
+            'description': '检测起始日期，格式YYYY-MM-DD，选填',
+            'required': False
+        },
+        {
+            'name': 'end_date',
+            'type': 'string',
+            'description': '检测结束日期，格式YYYY-MM-DD，选填',
+            'required': False
+        }
+    ]
+    def call(self, params: str, **kwargs) -> str:
+        import json
+        args = json.loads(params)
+        ts_code = args['ts_code']
+        today = datetime.now().date()
+        # 处理日期范围
+        if 'start_date' in args and args['start_date']:
+            start_date = args['start_date']
+        else:
+            start_date = (today - timedelta(days=365)).strftime('%Y-%m-%d')
+        if 'end_date' in args and args['end_date']:
+            end_date = args['end_date']
+        else:
+            end_date = today.strftime('%Y-%m-%d')
+        # 获取数据
+        db_path = os.path.join(os.path.dirname(__file__), 'stock_data.db')
+        engine = create_engine(f"sqlite:///{db_path}", connect_args={"check_same_thread": False})
+        sql = """
+            SELECT trade_date, close FROM stock_price
+            WHERE ts_code = ? AND trade_date >= ? AND trade_date <= ?
+            ORDER BY trade_date ASC
+        """
+        df = pd.read_sql(sql, engine, params=(ts_code, start_date, end_date))
+        if len(df) < 30:
+            return '历史数据不足，无法进行MACD分析。'
+        df['close'] = pd.to_numeric(df['close'], errors='coerce')
+        df = df.dropna(subset=['close'])
+        # 计算EMA
+        ema12 = df['close'].ewm(span=12, adjust=False).mean()
+        ema26 = df['close'].ewm(span=26, adjust=False).mean()
+        # 计算DIF和DEA
+        df['DIF'] = ema12 - ema26
+        df['DEA'] = df['DIF'].ewm(span=9, adjust=False).mean()
+        df['MACD'] = 2 * (df['DIF'] - df['DEA'])
+        # 检测金叉(DIF上穿DEA)和死叉(DIF下穿DEA)
+        golden_cross = df[(df['DIF'] > df['DEA']) & (df['DIF'].shift(1) <= df['DEA'].shift(1))]
+        death_cross = df[(df['DIF'] < df['DEA']) & (df['DIF'].shift(1) >= df['DEA'].shift(1))]
+        # 结果表格
+        golden_md = golden_cross[['trade_date', 'DIF', 'DEA']].to_markdown(index=False) if len(golden_cross) > 0 else '无金叉'
+        death_md = death_cross[['trade_date', 'DIF', 'DEA']].to_markdown(index=False) if len(death_cross) > 0 else '无死叉'
+        result_md = f"### 金叉日期\n{golden_md}\n\n### 死叉日期\n{death_md}"
+        # 绘制MACD图
+        save_dir = os.path.join(os.path.dirname(__file__), 'image_show')
+        os.makedirs(save_dir, exist_ok=True)
+        filename = f'macd_{ts_code}_{int(time.time()*1000)}.png'
+        save_path = os.path.join(save_dir, filename)
+        fig, (ax1, ax2) = plt.subplots(2, 1, figsize=(12, 10), gridspec_kw={'height_ratios': [3, 1]})
+        x_indices = range(len(df))
+        # 价格+MACD线
+        ax1.plot(x_indices, df['close'].values, label='收盘价', linewidth=1)
+        ax1.plot(x_indices, df['DIF'].values, label='DIF', linewidth=1)
+        ax1.plot(x_indices, df['DEA'].values, label='DEA', linewidth=1)
+        if len(golden_cross) > 0:
+            golden_idx = [df.index.get_loc(i) for i in golden_cross.index]
+            ax1.scatter(golden_idx, golden_cross['close'].values, color='red', marker='^', label='金叉', zorder=5, s=50)
+        if len(death_cross) > 0:
+            death_idx = [df.index.get_loc(i) for i in death_cross.index]
+            ax1.scatter(death_idx, death_cross['close'].values, color='green', marker='v', label='死叉', zorder=5, s=50)
+        ax1.set_xlabel('日期')
+        ax1.set_ylabel('价格')
+        ax1.set_title(f'{ts_code} MACD指标分析')
+        ax1.legend()
+        ax1.grid(True, alpha=0.3)
+        # MACD柱状图
+        macd_colors = ['red' if v > 0 else 'green' for v in df['MACD'].values]
+        ax2.bar(x_indices, df['MACD'].values, color=macd_colors, width=0.8)
+        ax2.plot(x_indices, df['DIF'].values, label='DIF', linewidth=1)
+        ax2.plot(x_indices, df['DEA'].values, label='DEA', linewidth=1)
+        ax2.set_xlabel('日期')
+        ax2.set_ylabel('MACD')
+        ax2.legend()
+        ax2.grid(True, alpha=0.3)
+        # 设置横坐标标签为日期
+        total_len = len(df)
+        date_labels = df['trade_date'].tolist()
+        if total_len > 12:
+            step = max(1, total_len // 10)
+            show_idx = list(range(0, total_len, step))
+            show_labels = [date_labels[i] for i in show_idx]
+            for ax in [ax1, ax2]:
+                ax.set_xticks(show_idx)
+                ax.set_xticklabels(show_labels, rotation=45)
+        else:
+            for ax in [ax1, ax2]:
+                ax.set_xticks(range(total_len))
+                ax.set_xticklabels(date_labels, rotation=45)
+        plt.tight_layout()
+        plt.savefig(save_path)
+        plt.close(fig)
+        img_path = os.path.join('image_show', filename)
+        img_md = f'![MACD分析]({img_path})'
+        return f"{result_md}\n\n{img_md}"
+
+
 # prophet_analysis工具
 @register_tool('prophet_analysis')
 class ProphetAnalysisTool(BaseTool):
@@ -400,7 +518,7 @@ def init_agent_service():
                 "autoApprove": []
             }
         }
-    }, 'exc_sql', 'arima_stock', 'boll_detection', 'prophet_analysis']
+    }, 'exc_sql', 'arima_stock', 'boll_detection', 'macd_detection', 'prophet_analysis']
 
     try:
         bot = Assistant(
@@ -455,6 +573,7 @@ def app_gui():
                 '预测贵州茅台未来7天的收盘价',
                 '检测贵州茅台近一年超买超卖点',
                 '分析贵州茅台近一年周期性规律',
+                '检测贵州茅台近一年MACD金叉死叉',
                 '贵州茅台最近的热点新闻',
             ]
         }

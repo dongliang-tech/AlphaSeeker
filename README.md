@@ -12,9 +12,14 @@
 - **Tavily 搜索** - 集成网络搜索，获取股票相关热点新闻
 - **ARIMA 预测** - 基于时间序列分析预测未来价格走势
 - **布林带检测** - 识别超买超卖点
+- **MACD 指标分析** - 检测金叉死叉信号
 - **Prophet 周期分析** - 分析股票价格周期性规律
 - **智能图表** - 自动生成统计图表
 - **Web 界面** - 基于 Streamlit 的友好交互界面
+
+## 界面演示
+
+![Demo](screenshots/demo.png)
 
 ## 快速开始
 
@@ -123,6 +128,8 @@ python stock_query_full.py    # 完整版 - 所有功能
 ├── sqlite_import_stock.py  # 数据导入工具
 ├── stock_data.db           # SQLite 数据库（自带示例数据）
 ├── faq.txt                 # 常见问题知识库
+├── screenshots/            # 截图目录
+│   └── demo.png            # 界面演示截图
 ├── requirements.txt        # Python 依赖
 ├── .env.example            # 环境变量模板
 └── LICENSE                 # Apache License 2.0
@@ -136,6 +143,7 @@ python stock_query_full.py    # 完整版 - 所有功能
 | Tavily 搜索 | | ✅ | | | ✅ |
 | ARIMA 预测 | | | ✅ | ✅ | ✅ |
 | 布林带检测 | | | | ✅ | ✅ |
+| MACD 指标分析 | | | | | ✅ |
 | Prophet 周期分析 | | | | | ✅ |
 
 ## 支持的查询示例
@@ -144,6 +152,7 @@ python stock_query_full.py    # 完整版 - 所有功能
 - "查询贵州茅台近一个月的价格走势"
 - "预测贵州茅台未来7天的收盘价"
 - "检测贵州茅台近一年超买超卖点"
+- "检测贵州茅台近一年MACD金叉死叉"
 - "分析贵州茅台近一年周期性规律"
 - "贵州茅台最近的热点新闻"
 
