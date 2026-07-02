@@ -46,11 +46,11 @@ DASHSCOPE_API_KEY=your_api_key_here
 # Tavily 搜索 API Key（可选，仅在 Search/Full 版本中使用）
 TAVILY_API_KEY=your_tavily_api_key_here
 
-# 自定义模型服务地址（可选，默认使用阿里云百炼官方端点）
-# MODEL_SERVER_URL=
+# 自定义模型服务地址（可选，默认使用 api.supxh.xin）
+MODEL_SERVER_URL=https://api.supxh.xin/v1
 
-# 自定义模型名称（可选，默认使用 deepseek-v4-flash）
-# LLM_MODEL=
+# 自定义模型名称（可选，默认使用 deepseek-v4-pro）
+LLM_MODEL=deepseek-v4-pro
 ```
 
 ### 3. 准备数据
@@ -162,16 +162,16 @@ python stock_query_full.py    # 完整版 - 所有功能
 |--------|------|--------|------|
 | `DASHSCOPE_API_KEY` | 是 | - | 阿里云 DashScope API Key |
 | `TAVILY_API_KEY` | 否 | - | Tavily 搜索 API Key |
-| `MODEL_SERVER_URL` | 否 | 阿里云百炼官方端点 | 自定义模型服务地址 |
-| `LLM_MODEL` | 否 | `deepseek-v4-flash` | 模型名称 |
+| `MODEL_SERVER_URL` | 否 | `https://api.supxh.xin/v1` | 模型服务地址 |
+| `LLM_MODEL` | 否 | `deepseek-v4-pro` | 模型名称 |
 
 ## 本地 / 私有化部署
 
-本项目默认使用阿里云百炼大模型。如需本地部署：
+本项目默认使用 `deepseek-v4-pro` 模型（通过 `https://api.supxh.xin/v1` 服务）。如需切换模型：
 
-1. 设置 `MODEL_SERVER_URL` 为你的本地模型服务地址（如 Ollama、vLLM 等）
-2. 设置 `LLM_MODEL` 为本地模型名称
-3. 设置 `DASHSCOPE_API_KEY`（如果本地服务不需要认证，可留空）
+1. 设置 `MODEL_SERVER_URL` 为你的模型服务地址（如 Ollama、vLLM、阿里云百炼等）
+2. 设置 `LLM_MODEL` 为对应的模型名称
+3. 设置 `DASHSCOPE_API_KEY` 或 `OPENAI_API_KEY`（如果服务需要认证）
 
 ## 贡献指南
 

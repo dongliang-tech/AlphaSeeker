@@ -120,9 +120,9 @@ def generate_chart_png(df_sql, save_path):
 # ====== 初始化股票助手服务 ======
 def init_agent_service():
     """初始化股票助手服务"""
-    model_server = os.getenv('MODEL_SERVER_URL', 'https://dashscope.aliyuncs.com/compatible-mode/v1')
+    model_server = os.getenv('MODEL_SERVER_URL', 'https://api.supxh.xin/v1')
     llm_cfg = {
-        'model': os.getenv('LLM_MODEL', 'deepseek-v4-flash'),
+        'model': os.getenv('LLM_MODEL', 'deepseek-v4-pro'),
         'model_type': 'oai',
         'model_server': model_server,
         'api_key': os.getenv('DASHSCOPE_API_KEY', ''),
